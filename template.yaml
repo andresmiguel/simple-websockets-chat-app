@@ -9,7 +9,7 @@ Description: >
 Parameters:
   TableName:
     Type: String
-    Default: 'simplechat_connections'
+    Default: 'ab_simplechat_connections'
     Description: (Required) The name of the new DynamoDB to store connection identifiers for each connected clients. Minimum 3 characters
     MinLength: 3
     MaxLength: 50
@@ -108,8 +108,8 @@ Resources:
       - AttributeName: "connectionId"
         KeyType: "HASH"
       ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
       SSESpecification:
         SSEEnabled: True
       TableName: !Ref TableName
@@ -118,7 +118,7 @@ Resources:
     Properties:
       CodeUri: onconnect/
       Handler: app.handler
-      MemorySize: 256
+      MemorySize: 128
       Runtime: nodejs12.x
       Environment:
         Variables:
@@ -139,7 +139,7 @@ Resources:
     Properties:
       CodeUri: ondisconnect/
       Handler: app.handler
-      MemorySize: 256
+      MemorySize: 128
       Runtime: nodejs12.x
       Environment:
         Variables:
@@ -160,7 +160,7 @@ Resources:
     Properties:
       CodeUri: sendmessage/
       Handler: app.handler
-      MemorySize: 256
+      MemorySize: 128
       Runtime: nodejs12.x
       Environment:
         Variables:
