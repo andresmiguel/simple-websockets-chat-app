@@ -182,6 +182,32 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref SendMessageFunction
       Principal: apigateway.amazonaws.com
+  SimpleChatS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ab-simplechat-bucket
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+    DeletionPolicy: Retain
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Id: MyPolicy
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref SimpleChatS3Bucket
+                - /*
+      Bucket: !Ref SimpleChatS3Bucket
 
 Outputs:
   ConnectionsTableArn:
@@ -203,3 +229,18 @@ Outputs:
   WebSocketURI:
     Description: "The WSS Protocol URI to connect to"
     Value: !Join [ '', [ 'wss://', !Ref SimpleChatWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
+
+  WebsiteURL:
+    Value: !GetAtt 
+      - SimpleChatS3Bucket
+      - WebsiteURL
+    Description: URL for website hosted on S3
+    
+  S3BucketSecureURL:
+    Value: !Join 
+      - ''
+      - - 'https://'
+        - !GetAtt 
+          - SimpleChatS3Bucket
+          - DomainName
+    Description: Name of S3 bucket to hold website content
